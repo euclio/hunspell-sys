@@ -1,6 +1,8 @@
 # hunspell-sys
 
-![Crate version](https://img.shields.io/crates/v/hunspell-sys.svg) ![Documentation](https://docs.rs/hunspell-sys/badge.svg) [![Build Status](https://travis-ci.com/euclio/hunspell-sys.svg?branch=master)](https://travis-ci.com/euclio/hunspell-sys)<Paste>
+[![Crate version](https://img.shields.io/crates/v/hunspell-sys.svg)](https://crates.io/hunspell-sys/crates/hunspell-sys)
+[![Documentation](https://docs.rs/hunspell-sys/badge.svg)](https://docs.rs/hunspell-sys)
+[![Build Status](https://travis-ci.com/euclio/hunspell-sys.svg?branch=master)](https://travis-ci.com/euclio/hunspell-sys)
 
 Rust bindings for the [hunspell] C API.
 
