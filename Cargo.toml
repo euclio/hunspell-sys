@@ -8,6 +8,7 @@ repository = "https://github.com/euclio/hunspell-sys"
 keywords = ["hunspell"]
 categories = ["external-ffi-bindings"]
 license = "MIT OR Apache-2.0"
+readme = "README.md"
 
 [badges]
 travis-ci = { repository = "euclio/hunspell-sys" }
