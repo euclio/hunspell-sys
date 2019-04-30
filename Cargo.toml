@@ -18,3 +18,4 @@ travis-ci = { repository = "euclio/hunspell-sys" }
 [build-dependencies]
 bindgen = "0.49.0"
 pkg-config = "0.3.14"
+autotools = "0.2.1"

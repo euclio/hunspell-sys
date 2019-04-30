@@ -3,10 +3,24 @@ use std::error::Error;
 use std::path::PathBuf;
 use std::process;
 
-fn run() -> Result<(), Box<Error>> {
-    pkg_config::probe_library("hunspell")?;
+use autotools;
 
-    let bindings = bindgen::Builder::default()
+fn run() -> Result<(), Box<Error>> {
+    let mut builder = bindgen::Builder::default();
+
+    if pkg_config::probe_library("hunspell").is_err() {
+        let dst = autotools::Config::new("vendor")
+            .reconf("-ivf")
+            .cxxflag("-fPIC")
+            .build();
+
+        println!("cargo:rustc-link-search=native={}", dst.join("lib").display());
+        println!("cargo:rustc-link-lib=static=hunspell-1.7");
+
+        builder = builder.clang_arg(format!("-I{}", dst.join("include").display()));
+    }
+
+    let bindings = builder
         .header("wrapper.h")
         .generate()
         .expect("could not generate bindings");
