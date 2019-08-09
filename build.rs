@@ -1,11 +1,10 @@
 use std::env;
 use std::error::Error;
 use std::path::PathBuf;
-use std::process;
 
 use autotools;
 
-fn run() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let mut builder = bindgen::Builder::default();
 
     let libcpp = if cfg!(target_os = "macos") {
@@ -44,11 +43,4 @@ fn run() -> Result<(), Box<Error>> {
     bindings.write_to_file(out_path.join("bindings.rs"))?;
 
     Ok(())
-}
-
-fn main() {
-    if let Err(err) = run() {
-        eprintln!("{}", err);
-        process::exit(1);
-    }
 }
