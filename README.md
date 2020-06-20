@@ -7,3 +7,15 @@
 Rust bindings for the [hunspell] C API.
 
 [hunspell]: https://hunspell.github.io/
+
+## Building
+
+By default `hunspell-sys` searches while building for hunspell library with `pkg-config`.
+If not found, then the hunspell library form the `vendor` git submodule will be build with autotools.
+
+If autotools are unavailable (e.g. on Windows), then one can configure `hunspell-sys` to build the hunspell library without autotools with the `build-cc` feature:
+
+```toml
+[dependencies]
+hunspell-sys = { version = 0.1.3, default-features = false, features = ["build-cc"] }
+```

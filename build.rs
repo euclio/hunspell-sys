@@ -2,13 +2,14 @@ use std::env;
 use std::error::Error;
 use std::path::PathBuf;
 
-#[cfg(not(target_env = "msvc"))]
-use autotools;
-
-#[cfg(target_env = "msvc")]
-use cc;
-
-#[cfg(target_env = "msvc")]
+/// builds hunspell in the `vendor` git submodule with the
+/// `cc` crate: ignore any hunspell's build-scripts and
+/// just compile the source code to a static lib.
+///
+/// This is a workaround on targets without autotools (i.e. Windows).
+/// Otherwise use the `build-autotools` feature to build
+/// hunspell using its build scripts.
+#[cfg(feature = "build-cc")]
 fn build_hunspell(builder: bindgen::Builder) -> bindgen::Builder {
     cc::Build::new()
         .file("vendor/src/hunspell/affentry.cxx")
@@ -28,7 +29,14 @@ fn build_hunspell(builder: bindgen::Builder) -> bindgen::Builder {
     builder.clang_arg(format!("-I{}", "vendor/src"))
 }
 
-#[cfg(not(target_env = "msvc"))]
+/// builds hunspell in the `vendor` git submodule with the
+/// `autotools` crate: relays hunspell's build-scripts and
+/// just compile the source code to a static lib.
+///
+/// This is the default, but only works when autotools are
+/// installed.
+/// Without autotools prefere the `build-cc` feature.
+#[cfg(feature = "build-autotools")]
 fn build_hunspell(builder: bindgen::Builder) -> bindgen::Builder {
     let dst = autotools::Config::new("vendor")
         .reconf("-ivf")
