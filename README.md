@@ -10,7 +10,7 @@ Rust bindings for the [hunspell] C API.
 
 ## Building
 
-By default `hunspell-sys` searches while building for hunspell library with `pkg-config`.
+By default `hunspell-sys` searches for a hunspell library installation with `pkg-config`.
 
 Optionally, the bundled code of hunspell can be compiled with the `cc` crate.
 This behavior needs to activated by the `bundled` feature.
