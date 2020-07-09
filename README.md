@@ -17,5 +17,5 @@ This behavior needs to activated by the `bundled` feature.
 
 ```toml
 [dependencies]
-hunspell-sys = { version = 0.1.3, features = ["bundled"] }
+hunspell-sys = { version = 0.2.1, features = ["bundled"] }
 ```
