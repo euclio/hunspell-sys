@@ -17,3 +17,6 @@ matrix:
             - libhunspell-dev
           update: true
     - name: Bundled Library
+      script:
+        - cargo build --verbose --feature bundled
+        - cargo test --verbose --feature bundled

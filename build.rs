@@ -5,12 +5,25 @@ use std::path::PathBuf;
 /// builds hunspell in the `vendor` git submodule with the
 /// `cc` crate: ignore any hunspell's build-scripts and
 /// just compile the source code to a static lib.
-///
-/// This is a workaround on targets without autotools (i.e. Windows).
-/// Otherwise use the `build-autotools` feature to build
-/// hunspell using its build scripts.
-#[cfg(feature = "build-cc")]
-fn build_hunspell(builder: bindgen::Builder) -> bindgen::Builder {
+/// 
+/// Note: list of *.cxx files might need to be updated,
+/// if `vendor` git submodule is updated
+#[cfg(feature = "bundled")]
+fn build_or_find_hunspell() -> Result<bindgen::Builder, Box<dyn Error>> {
+    let libcpp = if cfg!(target_os = "macos") {
+        Some("dylib=c++")
+    } else if cfg!(target_os = "linux") {
+        Some("dylib=stdc++")
+    } else {
+        None
+    };
+
+    if let Some(link) = libcpp {
+        println!("cargo:rustc-link-lib={}", link);
+    }
+
+    println!("cargo:rustc-link-lib=static=hunspell-1.7");
+
     cc::Build::new()
         .file("vendor/src/hunspell/affentry.cxx")
         .file("vendor/src/hunspell/affixmgr.cxx")
@@ -26,53 +39,19 @@ fn build_hunspell(builder: bindgen::Builder) -> bindgen::Builder {
         .cpp(true)
         .compile("hunspell-1.7");
 
-    builder.clang_arg(format!("-I{}", "vendor/src"))
+    Ok(bindgen::Builder::default().clang_arg(format!("-I{}", "vendor/src")))
 }
 
-/// builds hunspell in the `vendor` git submodule with the
-/// `autotools` crate: relays hunspell's build-scripts and
-/// just compile the source code to a static lib.
-///
-/// This is the default, but only works when autotools are
-/// installed.
-/// Without autotools prefere the `build-cc` feature.
-#[cfg(feature = "build-autotools")]
-fn build_hunspell(builder: bindgen::Builder) -> bindgen::Builder {
-    let dst = autotools::Config::new("vendor")
-        .reconf("-ivf")
-        .cxxflag("-fPIC")
-        .build();
+#[cfg(not(feature = "bundled"))]
+fn build_or_find_hunspell() -> Result<bindgen::Builder, Box<dyn Error>> {
+    pkg_config::probe_library("hunspell")?;
 
-    println!(
-        "cargo:rustc-link-search=native={}",
-        dst.join("lib").display()
-    );
-
-    builder.clang_arg(format!("-I{}", dst.join("include").display()))
+    Ok(bindgen::Builder::default())
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut builder = bindgen::Builder::default();
-
-    let libcpp = if cfg!(target_os = "macos") {
-        Some("dylib=c++")
-    } else if cfg!(target_os = "linux") {
-        Some("dylib=stdc++")
-    } else {
-        None
-    };
-
-
-    if pkg_config::probe_library("hunspell").is_err() {
-
-        println!("cargo:rustc-link-lib=static=hunspell-1.7");
-
-        if let Some(link) = libcpp {
-            println!("cargo:rustc-link-lib={}", link);
-        }
-
-        builder = build_hunspell(builder);
-    }
+    
+    let builder = build_or_find_hunspell()?;
 
     let bindings = builder
         .header("wrapper.h")
