@@ -5,18 +5,17 @@ rust:
   - stable
   - beta
   - nightly
+addons:
+  apt:
+    packages:
+      - libhunspell-dev
+    update: true
 matrix:
   allow_failures:
     - rust: nightly
   fast_finish: true
-  include:
-    - name: System Library
-      addons:
-        apt:
-          packages:
-            - libhunspell-dev
-          update: true
-    - name: Bundled Library
-      script:
-        - cargo build --verbose --features bundled
-        - cargo test --verbose --features bundled
+script:
+  - cargo build --verbose
+  - cargo test --verbose
+  - cargo build --verbose --features bundled
+  - cargo test --verbose --features bundled
