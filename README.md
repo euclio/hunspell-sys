@@ -7,3 +7,15 @@
 Rust bindings for the [hunspell] C API.
 
 [hunspell]: https://hunspell.github.io/
+
+## Building
+
+By default `hunspell-sys` searches for a hunspell library installation with `pkg-config`.
+
+Optionally, the bundled code of hunspell can be compiled with the `cc` crate.
+This behavior needs to activated by the `bundled` feature.
+
+```toml
+[dependencies]
+hunspell-sys = { version = 0.1.3, features = ["bundled"] }
+```

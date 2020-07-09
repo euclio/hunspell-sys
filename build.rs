@@ -2,11 +2,14 @@ use std::env;
 use std::error::Error;
 use std::path::PathBuf;
 
-use autotools;
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let mut builder = bindgen::Builder::default();
-
+/// builds hunspell in the `vendor` git submodule with the
+/// `cc` crate: ignore any hunspell's build-scripts and
+/// just compile the source code to a static lib.
+/// 
+/// Note: list of *.cxx files might need to be updated,
+/// if `vendor` git submodule is updated
+#[cfg(feature = "bundled")]
+fn build_or_find_hunspell() -> Result<bindgen::Builder, Box<dyn Error>> {
     let libcpp = if cfg!(target_os = "macos") {
         Some("dylib=c++")
     } else if cfg!(target_os = "linux") {
@@ -15,24 +18,40 @@ fn main() -> Result<(), Box<dyn Error>> {
         None
     };
 
-    if pkg_config::probe_library("hunspell").is_err() {
-        let dst = autotools::Config::new("vendor")
-            .reconf("-ivf")
-            .cxxflag("-fPIC")
-            .build();
-
-        println!(
-            "cargo:rustc-link-search=native={}",
-            dst.join("lib").display()
-        );
-        println!("cargo:rustc-link-lib=static=hunspell-1.7");
-
-        if let Some(link) = libcpp {
-            println!("cargo:rustc-link-lib={}", link);
-        }
-
-        builder = builder.clang_arg(format!("-I{}", dst.join("include").display()));
+    if let Some(link) = libcpp {
+        println!("cargo:rustc-link-lib={}", link);
     }
+
+    println!("cargo:rustc-link-lib=static=hunspell-1.7");
+
+    cc::Build::new()
+        .file("vendor/src/hunspell/affentry.cxx")
+        .file("vendor/src/hunspell/affixmgr.cxx")
+        .file("vendor/src/hunspell/csutil.cxx")
+        .file("vendor/src/hunspell/filemgr.cxx")
+        .file("vendor/src/hunspell/hashmgr.cxx")
+        .file("vendor/src/hunspell/hunspell.cxx")
+        .file("vendor/src/hunspell/hunzip.cxx")
+        .file("vendor/src/hunspell/phonet.cxx")
+        .file("vendor/src/hunspell/replist.cxx")
+        .file("vendor/src/hunspell/suggestmgr.cxx")
+        .define("BUILDING_LIBHUNSPELL", "1")
+        .cpp(true)
+        .compile("hunspell-1.7");
+
+    Ok(bindgen::Builder::default().clang_arg(format!("-I{}", "vendor/src")))
+}
+
+#[cfg(not(feature = "bundled"))]
+fn build_or_find_hunspell() -> Result<bindgen::Builder, Box<dyn Error>> {
+    pkg_config::probe_library("hunspell")?;
+
+    Ok(bindgen::Builder::default())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    
+    let builder = build_or_find_hunspell()?;
 
     let bindings = builder
         .header("wrapper.h")
