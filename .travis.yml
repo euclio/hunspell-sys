@@ -18,5 +18,5 @@ matrix:
           update: true
     - name: Bundled Library
       script:
-        - cargo build --verbose --feature bundled
-        - cargo test --verbose --feature bundled
+        - cargo build --verbose --features bundled
+        - cargo test --verbose --features bundled
