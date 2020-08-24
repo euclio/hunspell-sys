@@ -16,12 +16,12 @@ travis-ci = { repository = "euclio/hunspell-sys" }
 [dependencies]
 
 [dev-dependencies]
-tempfile = "3.1.0"
+tempfile = "3.1"
 
 [build-dependencies]
-bindgen = "0.54.1"
-pkg-config = "0.3.17"
-cc = { version = "1.0.58", optional = true }
+bindgen = "0.54"
+pkg-config = "0.3"
+cc = { version = "1.0", optional = true }
 
 [features]
 
