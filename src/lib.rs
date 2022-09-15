@@ -42,13 +42,13 @@ program/S
         )
         .unwrap();
 
-        unsafe {
-            let h = Hunspell_create(
-                CString::new(aff.to_str().unwrap()).unwrap().as_ptr(),
-                CString::new(dic.to_str().unwrap()).unwrap().as_ptr(),
-            );
+        let aff = CString::new(aff.to_str().unwrap()).unwrap();
+        let dic = CString::new(dic.to_str().unwrap()).unwrap();
 
-            assert!(h != std::ptr::null_mut());
+        unsafe {
+            let h = Hunspell_create(aff.as_ptr(), dic.as_ptr());
+
+            assert!(!h.is_null());
 
             let cats = CString::new("cats").unwrap();
 
