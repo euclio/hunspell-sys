@@ -45,7 +45,7 @@ fn build_or_find_hunspell() -> Result<bindgen::Builder, Box<dyn Error>> {
 #[cfg(not(feature = "bundled"))]
 fn build_or_find_hunspell() -> Result<bindgen::Builder, Box<dyn Error>> {
     pkg_config::Config::new()
-        .atleast_version("1.7.0")
+        .atleast_version("1.0.0")
         .statik(cfg!(feature = "static"))
         .probe("hunspell")?;
 
