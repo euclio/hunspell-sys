@@ -24,7 +24,7 @@ pkg-config = "0.3.17"
 cc = { version = "1.0.58", optional = true }
 
 [features]
-default = []
+default = [ "bindgen/runtime" ]
 bundled = [ "cc" ]
 
 # link libclang statically
