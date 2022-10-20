@@ -10,12 +10,22 @@ Rust bindings for the [hunspell] C API.
 
 ## Building
 
-By default `hunspell-sys` searches for a hunspell library installation with `pkg-config`.
+By default `hunspell-sys` searches for a hunspell library installation with `pkg-config`. By default the linkage is `dynamic`, if `static` is required use `static`
 
-Optionally, the bundled code of hunspell can be compiled with the `cc` crate.
-This behavior needs to activated by the `bundled` feature.
+Optionally, the bundled code of hunspell can be compiled with the `cc` crate and will be linked `static`ally when the `bundled` feature is present. The feature `static` is not required for this, the `bundled` feature will always link the produced hunspell artifact statically.
 
 ```toml
 [dependencies]
-hunspell-sys = { version = "0.2.1", features = ["bundled"] }
+hunspell-sys = { version = "0.3.1", features = ["bundled"] }
+```
+
+### musl targets
+
+If compiling for/on `musl` systems, `libclang` as used by `bindgen-rs`
+must be linked statically as well, which can be achieved with feature
+`static_libclang`.
+
+```toml
+[dependencies]
+hunspell-sys = { version = "0.3.1", features = ["bundled", "static_libclang"] }
 ```
