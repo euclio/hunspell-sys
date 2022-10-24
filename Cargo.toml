@@ -19,12 +19,15 @@ travis-ci = { repository = "euclio/hunspell-sys" }
 tempfile = "3.1.0"
 
 [build-dependencies]
-bindgen = "0.55.0"
+bindgen = { version = "0.61.0", default-features = false, features = ["logging", "which-rustfmt"]}
 pkg-config = "0.3.17"
 cc = { version = "1.0.58", optional = true }
 
 [features]
+default = [ "bindgen/runtime" ]
+bundled = [ "cc" ]
 
-default = []
-
-bundled = ["cc"]
+# link libclang statically
+static_libclang = [ "bindgen/static" ]
+# link system hunspell statically
+static = []
